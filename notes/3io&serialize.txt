@@ -1,0 +1,138 @@
+IO流
+
+      节点流
+           字节流
+               输入字节流 InputStream
+               输出字节流 OutputStream
+
+           字符流
+               输入字符流 Reader
+               输出字符流 Writer
+
+      处理流
+           字节字符转换流
+               输入字节字符转换流 InputStreamReader
+               输出字符字节转换流 OutputStreamWriter
+
+           缓冲流
+               字节缓冲流
+                   输入字节缓冲流 BufferedInputStream
+                   输出字节缓冲流 BufferedOutputStream
+
+               字符缓冲流
+                   输入字符缓冲流 BufferedReader
+                   输出字符缓冲流 BufferedWriter
+
+           对象流（序列化与反序列化）
+               输入对象流 ObjectInputStream
+               输出对象流 ObjectOutputStream
+
+      缓冲流
+
+            文件 -- 读入缓冲区 -- 读入程序内存 -- 程序
+
+            提高读取效率，减少对磁盘的访问
+
+            不能直接读取文件，只能对已存在的数据流进行封装
+
+            字节缓冲流
+                 字节输入缓冲流 BufferedInputStream
+                     使用字节流作为基础管道的基础上，提供了一个缓冲区，在访问硬盘时缓冲区可以一次性存入多个字节，
+                     从缓冲区中将数据读入到字节流中，再到程序内存中。
+
+                 字节输出缓冲流 BufferedOutputStream
+                     将字符串转成byte（str.getBytes()）保存到byte数组中，使用字节输出缓冲流将字符内容写入到文件中。
+
+            字符缓冲流
+                 字符输入缓冲流 BufferedReader
+                     多了个readLine()方法，可以直接读取一整行数据；
+
+                 字符输出缓冲流 BufferedWriter
+                 字符输出缓冲流 BufferedWriter
+
+
+      序列化
+              序列化是指将内存中的对象输出到硬盘文件中进行保存；
+              反序列化就是相反的操作，从文件中读取数据并还原成内存中的对象。
+
+              序列化和反序列化操作：
+               1、让类实现序列化接口（java.io.Serializable）
+               2、通过数据流完成对象到文件的读写
+
+              序列化
+
+
+      序列化例子：
+             /**
+                 * 反序列化
+                 */
+                private static void deserializationTest() {
+                    InputStream inputStream = null;
+                    ObjectInputStream objectInputStream = null;
+                    try {
+                        inputStream = new FileInputStream("c:/sj.txt");
+                        objectInputStream =  new ObjectInputStream(inputStream);
+                        Student student = (Student) objectInputStream.readObject();
+                        System.out.println(student.getId()+", "+student.getName());
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            objectInputStream.close();
+                            inputStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+                /**
+                 * 序列化
+                 */
+                private static void serializeTest() {
+                    // 1、创建对象
+                    Student student = new Student();
+                    student.setId(1);
+                    student.setName("张三");
+                    // 2、通过 "  数据流  " 将对象写入到硬盘的文件中
+                    OutputStream outputStream = null;
+                    ObjectOutputStream objectOutputStream = null;
+                    try {
+                        outputStream = new FileOutputStream("c:/sj.txt");
+                        objectOutputStream = new ObjectOutputStream(outputStream);
+                        objectOutputStream.writeObject(student);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            objectOutputStream.close();
+                            outputStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+                如果是处理的字符比较多，如：数据传递、协议
+
+                正常读写的话，不考虑协议，如果读取视频用字节流
+
+                springMVC
+                mybaties
+
+                精力放在基础语法、部分高级应用（字符串处理，时间，集合，流会用，反射看的懂，泛型会用，多线程随缘，XML会解析）
+
+                ArrayList
+                hashSet
+                hashMap
+                linkedList
+
+                hash排序（可以了解）

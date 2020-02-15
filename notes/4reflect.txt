@@ -1,0 +1,189 @@
+反射的应用
+
+      反射
+
+            显示生活中的反射如通过镜子可以反射出你的样子，
+            水面可以反射出物体的形态等等，无论是哪种反射，
+            都是通过一个虚像映射到实物，这样我们就可以获取到实物的某些形态特征。
+
+            程序中的反射也是同样的道理，它完成的是通过一个实例化对象映射到对应的类，
+            在程序运行期间我们可以通过一个对象获取到该对象对应的类信息。
+
+            一句话简单理解反射：
+            正常情况下我们通过类来创建实例化对象，反射就是将这一过程进行反转，通过实例化对象类获取类的信息。
+
+      Class类
+
+            Class类是反射的源头，类的信息在java中如何描述？java也是将类的信息抽象成一个对象，Class类就是用来创建描述类信息的对象的。
+            Calss类是专门用来描述其他类的类，Class类的每一个实例化对象对应的都是其他类的结构特征（成员变量、方法、构造函数、父类、实现的接口）。
+
+            Class对象不能通过构造函数来创建，因为Class只有一个private的构造函数，外包无法直接调用。
+            3中创建方式：
+                 1、调用Class类的静态方法forName(String className)创建，className是目标类的全类名；
+                 2、通过目标类的class创建，java中的每一个类都可以调用类.class，这里的class不是属性，叫做“类字面量”，其作用是获取在内存中该类型Class对象的引用。
+                 3、通过目标类的实例化对象getClass()方法创建，getClass()是Object类中定义的方法，被所有的子类所继承，java中的每一个类都可以调用getClass()方法，获取内存中该类的Class对象的引用。
+
+            每个目标类在内存中的Class对象（该类的运行时类）只有一份，即clazz 和 clazz2 clazz3 所指向的引用对象是同一个。
+            通过Class对象可以获取到目标类的结构，成员变量，方法，构造函数，父类，实现的接口等等。
+
+
+        Class类中常用的方法
+
+            public native Booleanisinterface()                                   判断该类是否为接口
+            public native boolean isArray()                                      判断该类是否为数组
+            public Boolean isAnnotation()                                        判断该类是否为注解
+            public String getName()                                              获取该类的全类名
+            public ClassLoader getClassLoader()                                  获取类加载器
+            public native Class<? super T> getSuperclass()                       获取该类的直接父类
+            public Package getPackage()                                          获取该类的包
+            public String getPackageName()                                       获取该类的包名
+            public Class<?>[] getInterfaces()                                    获取该类的全部接口
+            public native intgetModiflers()                                      获取该类的访问权限修饰符
+            public Filed[] getFields()                                           获取该类的全部公有成员变量，包括继承自父类和自定义的
+            public Filed[] getDeclaredFields()                                   获取该类的自定义成员变量
+            public Filed[] getField(String name)                                 通过名称获取该类的公有成员变量，包括继承自父类和自定义的
+            public Filed[] getDeclaredFiled(String name)                         通过名称获取该类的自定义成员变量
+            public Method[] getMethods()                                         获取该类的全部共有方法，包括继承自父类和自定义的
+            public Method[] getDeclaredMethods()                                 获取该类的自定义方法
+            public Method getMethod(String name, Class<T> ...parameterTypes)     通过名称和参数信息获取该类的公有方法
+            public Method getDeclaredMethod(String name, Class<T> ...parameterTypes)     通过名称和参数信息获取该类的自定义方法
+            public Constructor<?>[] getConstructors()                            获取该类的公有构造函数
+            public Constructor<?>[] getDeclaredConstructors()                    获取该类的全部构造函数
+            public Constructor<T> getConstructor(Class<?> ...parameterTypes)             通过参数信息获取该类的公有构造函数
+            public Constructor<T> getDeclaredConstructor(Class<?> ...parameterTypes)     通过参数信息获取该类的构造函数
+
+
+      常规情况下：
+           先创建对象，再通过对象来调用方法，先有对象，再调方法。
+      反射情况下：
+           先获取方法对象，再调用方法对象的invoke()方法来完成目标方法的调用。
+
+      常规情况下，private的方法在外边无法访问，如果通过反射机制是可以在外边完成private方法的调用的，需要调用Method.setAccessible(true)来完成暴力访问。
+      常规情况下，private的成员变量在外边无法访问，如果通过反射机制是可以在外边完成private方法的调用的，需要调用field.setAccessible(true)来完成暴力访问。
+      常规情况下，private的构造函数在外边无法访问，但是在反射机制下，可以通过调用constructor.setAccessible(true)来完成暴力访问。
+
+      代理
+           代理是反射的一个重要应用
+           java中的代理模式的特点是委托类和代理类实现了同样的接口，即委托类和代理类都具备完成需求的能力，代理类可以为委托类进行消息预处理，过滤消息，以及事后处理消息等。
+           代理类和委托类之间存在注入的关联关系，即在设计程序是需要将委托类定义为代理类的成员变量。
+           代理类本身并不会真正的去执行业务逻辑，而是通过调用委托类的方式来完成。
+
+           简单来说就是我们在访问委托对象时，是通过代理对象来间接访问的，代理模式就是通过这种间接访问的方式，
+           为程序预留出可处理的空间，利用此空间，在不影响核心业务的基础上可以附加其他的业务，这就是代理模式的好处。
+
+           静态代理
+               静态代理需要预先写好代理类的代码，在编译期间代理类的class文件就已经生成。
+
+           动态代理
+               指在编译期并没有确定具体的代理类，在程序运行期间根据java的指示动态生成的方式。
+
+           通过java.lang.reflect.InvocationHandler接口和java.lang.reflect.Proxy类完成动态代理模式，动态指在编程代码的时候
+               并不知道具体的代理类是什么结构，在程序运行期间生产JDK动态代理类和动态代理对象。
+
+               动态代理类：自定义类，实现InvocationHandler接口
+
+         代理模式：
+               1、委托类和代理类需要实现同一个接口；
+               2、在代理类中定义一个委托类的成员变量；在创建代理对象时，需要将委托对象传入到代理对象中；
+               3、在代理类的接口方法中调用委托对象的接口方法；
+
+               静态代理：接口、委托类、静态代理类
+               动态代理：接口、委托类、代理模板类（不是代理类，程序运行期间借助于此模式动态生成一个代理类）
+
+                   代理模板类需要实现InvocationHandler接口
+
+
+      反射例子：
+            public class ReflectAplay {
+                public static void main(String[] args) {
+                    Person person = new Person();
+
+                    // 常规
+                    int id = person.getId();
+                    System.out.println(id);
+
+                    // 反射
+                    Class clazz = Person.class;
+                    try {
+                        Method method = clazz.getDeclaredMethod("getId", null);
+                        int id2 = (int) method.invoke(person, null);
+                        System.out.println(id2);
+
+                        // ----------------反射调用方法
+                        method = clazz.getDeclaredMethod("getName", null);
+                        // 反射不能访问私有方法，设置一下访问权限就可以访问了
+                        method.setAccessible(true);
+                        String str = (String) method.invoke(person, null);
+                        System.out.println(str);
+
+                        // ----------------反射调用成员变量
+                        Field field = clazz.getDeclaredField("name");
+                        field.setAccessible(true);
+                        field.set(person, "张三");
+                        System.out.println(person);
+
+                        // ----------------反射调用构造函数
+                        // 无参构造
+                        Constructor<Person> constructor = clazz.getConstructor(null);
+                        Person person2 = constructor.newInstance(null);
+                        System.out.println(person2);
+
+                        // 有参构造
+                        Constructor<Person> constructor2 = clazz.getDeclaredConstructor(int.class, String.class);
+                        constructor2.setAccessible(true);
+                        Person person3 = constructor2.newInstance(123, "三张");
+                        System.out.println(person3);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchFieldException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            public class ReflectTest {
+                public static void main(String[] args) {
+            //        forNameTest();
+            //        classTest();
+                    getClassTest();
+                }
+
+                /**
+                 * 方式三
+                 */
+                private static void getClassTest() {
+                    Person person = new Person();
+                    Class clazz = person.getClass();
+                    System.out.println(clazz);
+                }
+
+                /**
+                 * 方式二
+                 */
+                private static void classTest() {
+                    Class clazz = Person.class;
+                    System.out.println(clazz);
+                }
+
+                /**
+                 * 方式一
+                 */
+                private static void forNameTest() {
+                    try {
+                        Class clazz = Class.forName("com.fang.reflect.Person");
+                        System.out.println(clazz);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+      代理例子：
+

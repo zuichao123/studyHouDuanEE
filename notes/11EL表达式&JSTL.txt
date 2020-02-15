@@ -1,0 +1,182 @@
+// 在jsp中引入类文件
+    <%@ import="com.sunjian.xxx"%>
+
+// jsp中编写java代码
+    <%
+        // java代码....
+    %>
+
+// jsp中显示java变量  表达式
+    <%=
+        name
+    %>
+
+EL表达式
+    Expression Language（表达式语言）
+
+    EL表达式能干什么？
+        替代jsp页面中数据访问时的复制编码，jsp页面中数据访问是指在jsp文件中取出域对象中的数据域对象（pageContext  request  session  application），getAttribute(name)取出数据。
+
+    EL特点？
+        使用简单，EL只能在jsp中使用，jsp提供的一个组件，可以用更加简洁的方法来完成数据的访问，EL也属于中间层的组件，最终还是会转成底层的数据访问方式。
+
+    如何使用EL表达式？
+        语法：${EL表达式}
+            通过变量名取值（取出域对象中保存的数据，使用EL表达式的前提是在域对象中存入数据）
+            例如：
+                String message = "hello world";
+                req.setAttribute("message", message);
+
+                ${message} 或者${["message"]}
+
+            例如：取对象
+                User user = new User();
+                user.setName("sunjian");
+                user.setAge(32);
+                req.setAttribute("user", user);
+
+                ${user.name}
+                ${user.age}
+
+            例如：取list
+                List list = new ArrayList();
+                list.add(user);
+                list.add(user1);
+                req.setAttribute("list",list);
+
+                ${requestScope.list[0].name}
+                ${requestScope.list[1].age}
+                ${requestScope.list[0].name}
+                ${requestScope.list[1].age}
+
+            例如：取map
+                Map<String, User> map = new HashMap<>();
+                map.put("user", user);
+                map.put("user1", user1);
+
+                ${requestScope.map.user.name}
+                ${requestScope.map.user.age}
+                ${requestScope.map.["user1"].name}
+                ${requestScope.map.["user1"].age}
+
+
+        指定作用域
+            page作用域
+                ${pageScope.message}
+            request作用域
+                ${requestScope.message}
+            session作用域
+                ${sessionScope.message}
+            application作用域
+                ${applicationScope.message}
+
+
+JSTL
+    JSP Standard Tag Library     Jsp标准标签库
+    为什么要使用JSTL？
+        使用el可以简化jsp页面访问数据的编码，但是功能还是不够完善，如果要进行遍历集合操作，el表达式无法完成，就需要借助JSTL来完成集合的遍历。
+        实际开发中，el表达式和JSTL结合起来使用，JSTL负责处理逻辑，EL负责展示。
+
+        JSTL的优点？
+            提供了一组标准标签；
+            可用于编写各种动态功能。
+
+        如何使用JSP标准标签库？
+            1、导入jar包
+            2、在jsp页面中引入
+                <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+            3、在jsp页面中使用JSTL
+                1.通用标签：set、out、remove、catch
+
+            ​	2.条件标签：if、choose、when、otherwise
+
+            ​	3.迭代标签：forEach
+                    set：向域对象中添加数据
+                        <c:set var="key" value="value" scope=""request></c:set>
+                        默认是将数据保存到page作用域中，pageContext中，相当于pageContext.setAttribute("key", value);
+                        如果需要指定作用域，通过scope属性来完成。
+
+                        scope = "page" 默认，表示将数据保存到page作用域，pageContext对象中；
+                        scope = "request" 默认，表示将数据保存到request作用域，request对象中；
+                        scope = "session" 默认，表示将数据保存到session作用域，session对象中；
+                        scope = "application" 默认，表示将数据保存到application作用域，application对象中；
+
+                    out：输出域对象中的数据，与el表达式功能类似
+                        <c:out value="${message}" default="未定义"></c:out>
+
+                    remove：删除域对象中的数据
+                        <c:remove var="message"></c:remove>
+
+                    catch：捕获异常
+                        <c:catch var="error"></c:catch>
+                        ${error}
+
+                    if choose：条件标签
+                        <c:set var="num1" value="1" scope="request"></c:set>
+                        <c:set var="num2" value="2" scope="request"></c:set>
+                        <c:if test="${num1 > num2}">${num1}</c:if>
+                        <c:if test="${num2 > num1}">${num2}</c:if>
+
+                        <c:choose>
+                            <c:when test="${num1 > num2}">${num1}</c:when>
+                            <c:otherwise>${num2}</c:otherwise>
+                        </c:choose>
+
+                    forEach：遍历
+                        <table border="1" width="80%">
+                          <tr>
+                            <th>排列</th>
+                            <th>排列2</th>
+                            <th>学生编号</th>
+                            <th>学生姓名</th>
+                            <th>学生年龄</th>
+                          </tr>
+                          <c:forEach items="${requestScope.list}" var="student" step="1" begin="0" end="6" varStatus="status">
+                            <tr>
+                              <td>${status.index}</td>
+                              <td>${status.count}</td>
+                              <td>${student.id}</td>
+                              <td>${student.name}</td>
+                              <td>${student.age}</td>
+                            </tr>
+                          </c:forEach>
+                        </table>
+
+                            items：指定遍历的目标集合，从域对象中取，一般是从request中取。
+
+                            var：每次遍历出来的对象存入pageContext时的key值，循环体内部可以用EL表达式${var}进行取值。
+
+                            step：每次遍历的跨度。
+
+                            begin：遍历的起始位置。
+
+                            end：遍历的结束位置。
+
+                    fmt:format：格式化标签库：对日期或者数字类型的数据进行格式化操作。
+                        <%
+                            pageContext.setAttribute("date",new Date());
+                        %>
+                        ${date}
+                        <hr/>
+                        <fmt:formatDate value="${date}"></fmt:formatDate>
+                        <hr/>
+                        <fmt:formatDate value="${date}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate>
+                        <hr/>
+                        <%
+                            pageContext.setAttribute("num","32145.23464");
+                        %>
+                        <fmt:formatNumber value="${num}" maxFractionDigits="3" maxIntegerDigits="2"></fmt:formatNumber>
+
+                    fn:函数标签库：对保存在域对象中的字符串数据进行处理。
+                        <%
+                            pageContext.setAttribute("info","Java,C");
+                        %>
+                        ${fn:contains(info,"Java" )}<br/>
+                        ${fn:startsWith(info, "Ja")}<br/>
+                        ${fn:endsWith(info, "C")}<br/>
+                        ${fn:indexOf(info, "va")}<br/>
+                        ${fn:replace(info, "Java", "HTML")}<br/>
+                        ${fn:substring(info, 2, 4)}<br/>
+                        ${fn:split(info, ",")[1]}
+
+

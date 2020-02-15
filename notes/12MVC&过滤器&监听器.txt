@@ -1,0 +1,125 @@
+MVC
+    MVC是一种场景的软件架构模式，将软件分为三层，M(model) V(view) C(controller)
+    Model：模型层
+        被controller调用，负责进行业务逻辑的处理，提供模型数据
+    View：视图层
+        负责跟用户进行交互，将控制层处理的结果展示给用户
+    Controller：控制层
+        负责进行调度，接收客户端请求之后，选择相应的模型层进行处理，处理完成之后，拿到模型数据，再选择相应的视图层进行展示
+
+    流程
+        客户段请求被controller接收，controller调用模型层获取模型数据，将模型数据传给view，展示给用户。
+
+    Servlet         属于controller层
+    JSP             属于View层
+    Service、entity 属于Model层
+
+
+过滤器filter
+    1、过滤器是服务端的代码，用于拦截客户端传入的请求和服务端做出的响应。
+    2、监视，修改或以某种方式
+
+    如何使用？
+        与Servlet类似，Filter是一个接口，实现了该接口的类就具备了过滤的功能，实际开发中，只需要自定义一个类，让该类实现Filter即可。
+        1、创建一个自定义的java类，实现javax.Servlet.Filter接口；
+        2、在web.xml配置被过滤器捕获的请求/响应的映射；
+        3、doFilter方法中执行完过滤器的逻辑之后，需要进行filterChain.doFilter(request, response)方法调用，否则请求/响应无法向后传递。
+
+    Filter的声明周期？
+        1、tomcat服务启动之后，会创建Filter实例化对象；
+        2、调用init方法完成初始化操作；
+        3、当服务器接收一个可以被Filter拦截的请求时，执行doFilter方法来完成具体的拦截处理逻辑；
+        4、关闭tomcat服务器是，执行destroy方法释放当前Filter所占用的资源；
+
+    Filter声明周期的方法？
+        1、无参构造      只执行一次，当tomcat启动时执行；
+        2、init          只执行一次，Filter实例化对象创建完成时执行；
+        3、doFilter      执行多次，每次拦截到请求或者响应都会执行；
+        4、destory       只执行一次，当tomcat关闭时执行。
+
+    Filter过滤器的应用？
+        1、统一设置请求的编码，解决中文乱码问题；
+        2、屏蔽敏感词；
+        3、限制用户对某些资源的访问权限。
+
+
+监听器Listener
+    是一个对象，专门用来监听其他对象所发生的操作或改变，然后作出相应的处理，当被监听的对象发生某种变化时，立即采取相应的行动。
+
+    监听器的分类：
+        1、监听域对象的创建和销毁（pageContext、request、session、application）
+
+            监听域对象的创建和销毁？
+                1、实现ServletContextListenter、ServletRequestListener、HttpSessionListenet
+                2、在web.xml中配置
+                        <listener>
+                            <listener-class>com.sunjian.listener.TestListener</listener-class>
+                        </listener>
+
+                        <listener>
+                            <listener-class>com.sunjian.listener.SessionListener</listener-class>
+                        </listener>
+
+                        <listener>
+                            <listener-class>com.sunjian.listener.applicationListener</listener-class>
+                        </listener>
+
+            监听域对象中属性的新增、删除、修改事件？
+                新增
+                    setAttribute(String key, Object value)
+                删除
+                    removeAttribute(String key)
+                修改
+                    setAttribute(String key, Object value)
+
+        2、监听域对象中属性的新增，删除，修改事件
+
+            监听request的属性变化实现ServletRequestAttributeListener
+                当客户端访问web资源（Servlet、jsp）都会默认修改一次request对象的属性
+
+            监听session的属性变化实现HttPSessionAttributeListener
+
+
+            监听application的属性变化实现ServletContextAttributeListener
+
+                tomcat启动之后，当客户的第一次访问任意一个jsp资源时，会默认向application中添加两个属性：jspApplicationContextImpl 和 ELInterpreter；
+                第二次。。。第N次访问任何jsp资源时，不再添加，即它只会在tomcat启动时添加一次。
+                如果客户端访问的是Servlet资源，则不添加。
+
+        3、监听绑定到HttPSession中的某个对象的状态
+
+            通过实体类实现HttpSessionBindingListener接口来完成，不需要在web.xml中配置；
+            当服务端向session中添加被监听的对象时，会触发valueBound方法；
+            当服务端从session中移除被监听的对象时，会触发valueUnBound方法；
+            当服务器关闭tomcat时，会触发valueUnBound方法；
+            当服务器端销毁session时，会触发valueUnBound方法。
+
+                public class User implements HttpSessionBindingListener {
+                    @Override
+                    public void valueBound(HttpSessionBindingEvent httpSessionBindingEvent) {
+                        System.out.println("绑定了");
+                    }
+
+                    @Override
+                    public void valueUnbound(HttpSessionBindingEvent httpSessionBindingEvent) {
+                        System.out.println("解绑了");
+                    }
+                }
+
+                public class SessionServlet extends HttpServlet {
+                    @Override
+                    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                        this.doPost(req, resp);
+                    }
+
+                    @Override
+                    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                        User user = new User();
+                        HttpSession session = req.getSession();
+                        session.setAttribute("user", user); // 绑定
+                        session.removeAttribute("user"); // 解绑
+                    }
+                }
+
+
+

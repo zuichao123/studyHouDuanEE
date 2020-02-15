@@ -1,0 +1,224 @@
+Servlet
+    Servlet是java web提供的一个开放组件，是java web的基石，与平台无关的服务，运行在servlet容器中/WEB容器（tomcat），负责在客户端进行通信。
+
+    Servlet是一个接口，该接口的作用是让一个普通的JavaBean具备处理客户端请求的功能。
+    一个普通的JavaBean实现Servlet接口之后，就成为了一个控制器，可以处理客户端请求并且做出响应。
+
+    Servlet生命周期：
+        1、当浏览器请求Servlet时，首先在tomcat容器中查找该Servlet是否存在，
+            如果不存在，通过反射机制来调用它的无参构造方法来创建对象（Servlet必须无参构造）；
+            如果存在，直接到第3步；
+        2、调用init方法完成初始化操作；
+        3、调用service方法完成业务逻辑；
+        4、关闭tomcat应用时，调用destory方法释放当前Servlet对象所占用的资源；
+
+    Servlet声明周期方法：
+        1、无参构造函数        只执行一次，创建对象
+        2、init方法            只执行一次，初始化对象
+        3、service方法         执行多次，有多少请求，就执行多少次
+        4、destory方法         只执行一次，释放当前对象所占用的资源
+
+        init方法获取Servlet配置
+
+            ServletContext：Servlet上下文，Servlet对象的管理者，可以获取Servlet对象相关的各种资源，作用于整个Web应用，每一个Servlet都被他处理。
+
+                1、getInitParameter()    获取全局初始化参数
+                    <context-param>
+                        <!--全局参数，通过ServletContext可以取到；并且是独立于Servlet的，不能配置到Servlet中-->
+                        <param-name>username</param-name>
+                        <param-value>admin</param-value>
+                    </context-param>
+
+                2、getServerInfo()       获取当前WEB服务信息，tomcat
+                    String serverInfo = servletContext.getServerInfo();
+                    System.out.println(serverInfo);
+
+                3、getContextPath()      获取当前WEB应用名称/工程名
+                    String contextPath =  servletContext.getContextPath();
+                    System.out.println(contextPath);
+
+                4、getRealPath()         获取当前工程的绝对路径
+                    String path = servletContext.getRealPath("");
+                    System.out.println(path);
+
+            Servlet的层次结构
+                Servlet接口 (init、getServletConfig、service、getServletInfo、destory)
+                    |
+                    实现
+                    |
+                GenericServlet抽象类   实现了Servlet接口的无个方法
+                    |
+                    继承
+                    |
+                HTTPServlet抽象类      重写service，将service方法分发到doGet、doPost
+                    |
+                    继承
+                    |
+                开发者自定义Servlet（MyServlet）    重写doGet、doPost完成相应的业务逻辑
+
+
+    request.getRequestDispatcher()和response.sendRedirect()之间的区别
+
+        1.request.getRequestDispatcher()是请求转发，前后页面共享一个request ; 
+
+           request.getRequestDispather();返回的是一个RequestDispatcher对象。
+
+             RequestDispatcher.forward()是在服务器端运行; 
+
+                所以RequestDispatcher.forward()对于浏览器来说是“透明的”； 
+           
+        2.response.sendRedirect()是重新定向，前后页面不是一request。
+
+             HttpServletResponse.sendRedirect()是通过向客户浏览器发送命令来完成. 
+
+            而HttpServletResponse.sendRedirect()对于浏览器来说则不是“透明的”。
+
+        从上面可以看出，request.getRequestDispatcher()的功能相对来说比较强大。
+
+        总结如下：
+            1、通过转发方式完成页面跳转，是同一个请求。
+            2、通过重定向方式完成页面跳转，是两个请求。
+            3、通过转发的方式完成页面跳转，地址栏URL不变。
+            4、通过重定向的方式完成页面跳转，地址栏URL改变。
+            5、转发称之为服务器跳转。
+            6、重定向称之为客户端跳转。
+
+        以下是我给的建议：
+
+            （a） 如何跳转中不需要携带数据，推荐使用response.sendRedirect()方法
+
+            （b）如果跳转中需要携带数据，推荐使用request.getRequestDispatcher()，共享一个request
+
+
+    乱码处理
+        post方式
+            request.setCharacterEncoding("UTF-8");
+            String name = request.getParameter("name");
+            String pwd = request.getParameter("pwd");
+
+        get方式
+            String name = request.getParameter("name");
+            name = new String(name.getBytes("ISO-8859-1", "utf-8"));
+            String pwd = request.getParameter("pwd");
+            pwd = new String(pwd.getBytes("iS0-8859-1", "utf-8"));
+
+
+    session
+        会话，会话产生的前提？
+        服务器可以接受客户端请求，并且对这些请求进行给处理，将处理结构响应回客户端。但是服务器无法识别每一次http
+        请求是从哪个客户端发出的，它只会接收到一个请求信号。所以，需要一种技术来区分不同的请求，以便将响应返回给正确的请求，这种技术就是会话。
+
+        会话：就是客户端和服务器之间发生的一系列连续的请求和响应的过程，打开浏览器进行操作到关闭浏览器的过程。
+
+        会话状态是指服务器和浏览器在会话过程中产生的状态信息，借助于会话状态，服务器就能够把属于同一会话的一系列请求和响应的过程连接起来。
+
+        javaWEB开发中实现会话的两种方式：
+            1、session （默认30分钟）
+            2、cookie
+
+        服务器每天接受大量的请求，如何区分哪些请求属于哪个回话呢？即如何能识别出时来自同一个浏览器的请求，这就需要服务器对每一次请求进行识别。
+        属于同一个会话中的请求都有相同的标识，这就是sessionID。
+
+        创建session
+            HttpSession session = req.getSession();
+            session.setAttribute("name", "sunjian");
+
+        获取session
+            String name = session.getAttribute("name");
+
+        session常用方法：
+            1、String getId()                                // 获取sessionID
+            2、void setMaxInactiveInterval(int interval)     // 设置session失效时间，单位为秒
+            3、int getMaxInactiverInterval()                 // 获取session失效时间，单位为秒
+            4、void invalidate()                             // 设置session立即失效
+            5、void setAttribute(String key, Object value)   // 以键值对的形式用session保存数据
+            6、Object getAttribute(String key)               // 通过key值获取数据
+            7、void removeAttribute(String key)              // 通过key值删除数据
+
+
+    cookie
+        cookie和session一样，都是事先会话机制的一种技术，session是保存到服务器端的，cookie时保存到客户端的；
+
+        通过sessionID来区分不同的会话，sessionID是由客户端产生的，保存在客户端的cookie，传到服务端之后，再将sessionID自动保存到session中，session和cookie中都保存有sessionID。
+
+        cookie时服务器在http响应中附带给浏览器的一个文本文件，浏览器会保存cookie，在下一次访问服务器时再讲cookie传给服务端，服务端再次做出响应时，
+        又会将cookie带回给客户端，cookie就是这样在客户端和服务器之间来回传递。
+
+        java中有一个Cookie类，该类专门用来描述cookie：
+            创建cookie
+                Cookie cookie = new Cookie("name":"sunjian");
+                response.addCookie(cookie);
+
+                每一次客户端的请求都会在request对象中附带当前客户端中的所有cookie，服务器在做响应的时候，如果返回cookie对象，
+                客户端接收到改响应之后，会更新当前的本地cookie；（如果响应的cookie的key不存在，则添加一个新的cookie，如果响应的cookie的key存在，则
+                覆盖之前的cookie），在下一次请求的时候同样会将当前的cookie带入，服务器在做响应的时候重复之前的步骤。
+
+            读取cookie
+                Cookie[] cookies = request.getCookies();
+                for(Cookie c:cookies){
+                    c.getName();
+                    c.getValue();
+                }
+
+            方法：
+                void setMaxAge(int age)         // 设置cookie的有效时间，单位为秒
+                int getMaxAge()                 // 获取cookie的有效时间  （比如：设置cookie失效时，cookie.setMaxAge(0);resp.addCookie(cookie);切记要在添加回去否则不生效）
+                void setValue(String value)     // 修改cookie的值
+                String getName()                // 获取cookie的名称
+                String getValue()               // 获取cookie的值
+
+
+    request.getAttribute()和request.getParameter()的区别：
+        服务器端资源Servlet、jsp之间跳转、数据用getAttribute()获取
+        客户端和服务端进行交互时，请求中的参数用getParameter()获取
+        使用getAttribute()之前，必须有setAttribute()
+        使用getParameter()可以直接取
+
+
+    session和cookie的区别
+        session （如：用户名、密码）
+            保存在服务端
+            保存的数据类型时Object
+            随着会话的结束而销毁
+            保存重要信息
+
+        cookie
+            保存在客户端
+            保存的数据类型时String
+            cookie可以长期的保存在客户端
+            保存不重要的信息
+
+
+            JSP内置对象的作用域
+                4大作用域
+                    page作用域：
+                        对应的内置对象是pageContext
+
+                    request作用域：
+                        对应的内置对象是request
+
+                    session作用域：
+                        对应的内置对象是session
+
+                    application作用域：
+                        对应的内置对象是application（也就是ServletContext）
+
+                作用域的区别：
+                    page作用域只存在当前页面有效
+                    request作用域对应一次请求，在同一次请求中有效
+                    session作用域对应一次会话，在同一次会话中有效
+                    application作用域对应整个WEB应用程序，对应WEB服务（如：tomcat）
+
+            作用域从小到大排序：
+                page < request < session < application
+
+            服务端资源之间来回跳转的时候，一般的数据都保存在request中。
+            用户的登录信息，一般保存在session中。
+            所有用户共享的数据，网站访问量，文章的阅读量...，保存在application中。
+
+
+    Servlet和jsp功能一样的，可以替代的。
+        Servlet主要用来业务逻辑的；
+        jsp就是跟用户进行交互的；
+
+        请求 --> Servlet --> jsp
