@@ -29,7 +29,7 @@
          * @param req
          * @param resp
          */
-        private void uploadFilesForUtilsByteStream(HttpServletRequest req, HttpServletResponse resp) {
+        private void uploadFilesForUtilsByteStream(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             InputStream inputStream = null;
             OutputStream outputStream = null;
 
@@ -40,6 +40,7 @@
             // 2.5、设置文件大小限制（1bytes*1024=1KB * 1024=1MB * 1024=1GB * 1024=1TB）
             int size = 5;
             upload.setSizeMax(1024 * 1024 * size);
+            upload.setHeaderEncoding("UTF-8"); // 中文文件名乱码
             // 3、获取List<FileItem>
             try {
                 List<FileItem> list = upload.parseRequest(req);
@@ -48,14 +49,15 @@
                     // 如果是表单域，表示该值是一段文本，打印输出
                     if (fileItem.isFormField()) {
                         String name = fileItem.getFieldName();// 标签名
-                        String value = fileItem.getString("utf-8");
-                        System.out.println(name + ":" + value);
+                        //处理中文乱码
+                        String value = fileItem.getString("UTF-8");
+                        System.out.println(name+":"+value);
                     } else {
-                        inputStream = fileItem.getInputStream();
-                        outputStream = new FileOutputStream(req.getServletContext().getRealPath("files") + "/" + fileItem.getName());
+                        String path = req.getServletContext().getRealPath("files");
+                        inputStream = fileItem.getInputStream(); // 获取请求输入流
+                        outputStream = new FileOutputStream(path + "/" + fileItem.getName());
                         int temp = 0;
                         while ((temp = inputStream.read()) != -1) {
-                            System.out.println(temp);
                             outputStream.write(temp);
                         }
                     }
@@ -63,131 +65,58 @@
             } catch (FileUploadException e) {
                 String message = "文件大小不能超过"+size+"M，请重新选择上传！";
                 req.getSession().setAttribute("message", message);
-                try {
-                    System.out.println(message);
-                    resp.sendRedirect("index.jsp");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                resp.sendRedirect( "upload.jsp");
+                System.out.println(message);
             } finally {
-                try {
-                    outputStream.close();
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        /**
-         * 字符流上传
-         * @param req
-         * @param resp
-         */
-        private void uploadFilesForUtilsCharacterStream(HttpServletRequest req, HttpServletResponse resp) {
-            InputStream inputStream = null;
-            BufferedReader bufr = null;
-            OutputStream outputStream = null;
-            BufferedWriter bufw = null;
-
-            // 1、创建DiskFileItemFactory
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            // 2、创建文件解析器
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            // 2.5、设置文件大小限制（1bytes*1024=1KB * 1024=1MB * 1024=1GB * 1024=1TB）
-            int size = 5;
-            upload.setSizeMax(1024 * 1024 * size);
-            try {
-                // 3、获取List<FileItem>
-                List<FileItem> list = upload.parseRequest(req);
-                // 4、判断FileItem的类型，是否为表单域（文本输入）
-                for (FileItem fileItem : list) {
-                    // 如果是表单域，表示该值是一段文本，打印输出
-                    if (fileItem.isFormField()) {
-                        String name = fileItem.getFieldName();// 标签名
-                        String value = fileItem.getString("utf-8"); // 处理中文乱码
-                        System.out.println(name + ":" + value);
-                    } else {
-                        // 如果不是表单域，表示该值是一个文件，通过IO完成上传
-                        inputStream = fileItem.getInputStream();
-                        bufr = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-
-                        outputStream = new FileOutputStream(req.getServletContext().getRealPath("files") + "/" + fileItem.getName());
-                        bufw = new BufferedWriter(new OutputStreamWriter(outputStream));
-
-                        String data = null;
-                        while ((data = bufr.readLine()) != null) {
-                            System.out.println(data);
-                            bufw.write(data + "\n");
-                        }
-                    }
-                }
-            } catch (FileUploadException e) {
-                String message = "文件大小不能超过"+size+"M，请重新选择上传！";
-                req.getSession().setAttribute("message", message);
-                try {
-                    System.out.println(message);
-                    resp.sendRedirect("index.jsp");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                // 关流
-                try {
-                    bufw.close();
-                    outputStream.close();
-                    bufr.close();
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-
-
-    自定义文件上传例子：
-        public class UploadServlet extends HttpServlet {
-            @Override
-            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                this.doPost(req, resp);
-            }
-
-            @Override
-            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                uploadFiles(req, resp);
-            }
-
-            private void uploadFiles(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                // 获取输入流
-                InputStream inputStream = req.getInputStream();
-                // 转成缓冲字符流，并指定编码格式
-                BufferedReader bufr = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-
-                /** 将读取的上传文件输出到指定文件**/
-
-                // 定义输出流，并指定输出路径文件
-                OutputStream outputStream = new FileOutputStream(req.getServletContext().getRealPath("files" + "/" + "copy.txt"));
-                // 定义缓冲输出流
-                BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(outputStream));
-                String data = null;
-                while ((data = bufr.readLine()) != null){
-                    System.out.println(data);
-                    bufw.write(data);
-                }
-
-                // 关流
-                bufw.close();
                 outputStream.close();
-                bufr.close();
                 inputStream.close();
             }
         }
 
 
-文件下载
 
+文件下载
+    原理
+        当客户端的一个下载请求发送到服务端之后，首先服务器端中的java程序通过输入流读取在服务端本次存储的目标文件，
+        再通过输出流将文件的二进制数据流写入到响应（response）中，通过response传给了客户端，客户端进行下载即可，
+        使用客户端浏览器自带的下载工具来完成下载。
+
+
+    例子：
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            // 设置为下载模式
+            resp.setContentType("application/x-msdownload");
+
+            // 获取文件的存放路径
+            String path = req.getServletContext().getRealPath("files");
+            // 获取文件名 --------
+            String fileName = req.getParameter("fileName");
+            // 设置文件名，并处理中文
+            resp.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(fileName, "UTF-8"));
+
+            // 判断文件是否存在
+            File file = new File(path + "/" + fileName);
+            if(!file.exists()){
+                String message = "文件不存在！";
+                System.out.println(message);
+                HttpSession session = req.getSession();
+                session.setAttribute("message", message);
+                resp.sendRedirect("download.jsp");
+                return;
+            }
+
+            // 字节输入流
+            InputStream inputStream = new FileInputStream(file);
+            // 获取响应输出流
+            OutputStream outputStream = resp.getOutputStream();
+            int temp = 0;
+            while ((temp = inputStream.read()) != -1){
+                outputStream.write(temp);
+            }
+            // 关流
+            outputStream.close();
+            inputStream.close();
+
+            System.out.println("下载successful");
+        }

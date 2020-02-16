@@ -20,11 +20,9 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        uploadFiles(req, resp);
-
-//        uploadFilesForUtilsCharacterStream(req, resp);
         uploadFilesForUtilsByteStream(req, resp);
     }
+
 
     /**
      * 字符流上传
@@ -99,7 +97,7 @@ public class UploadServlet extends HttpServlet {
      * @param req
      * @param resp
      */
-    private void uploadFilesForUtilsByteStream(HttpServletRequest req, HttpServletResponse resp) {
+    private void uploadFilesForUtilsByteStream(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         
@@ -110,6 +108,7 @@ public class UploadServlet extends HttpServlet {
         // 2.5、设置文件大小限制（1bytes*1024=1KB * 1024=1MB * 1024=1GB * 1024=1TB）
         int size = 5;
         upload.setSizeMax(1024 * 1024 * size);
+        upload.setHeaderEncoding("UTF-8"); // 中文文件名乱码
         // 3、获取List<FileItem>
         try {
             List<FileItem> list = upload.parseRequest(req);
@@ -118,14 +117,15 @@ public class UploadServlet extends HttpServlet {
                 // 如果是表单域，表示该值是一段文本，打印输出
                 if (fileItem.isFormField()) {
                     String name = fileItem.getFieldName();// 标签名
-                    String value = fileItem.getString("utf-8");
-                    System.out.println(name + ":" + value);
+                    //处理中文乱码
+                    String value = fileItem.getString("UTF-8");
+                    System.out.println(name+":"+value);
                 } else {
-                    inputStream = fileItem.getInputStream();
-                    outputStream = new FileOutputStream(req.getServletContext().getRealPath("files") + "/" + fileItem.getName());
+                    String path = req.getServletContext().getRealPath("files");
+                    inputStream = fileItem.getInputStream(); // 获取请求输入流
+                    outputStream = new FileOutputStream(path + "/" + fileItem.getName());
                     int temp = 0;
                     while ((temp = inputStream.read()) != -1) {
-                        System.out.println(temp);
                         outputStream.write(temp);
                     }                    
                 }
@@ -133,21 +133,12 @@ public class UploadServlet extends HttpServlet {
         } catch (FileUploadException e) {
             String message = "文件大小不能超过"+size+"M，请重新选择上传！";
             req.getSession().setAttribute("message", message);
-            try {
-                System.out.println(message);
-                resp.sendRedirect("index.jsp");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            resp.sendRedirect( "upload.jsp");
+            System.out.println(message);
         } finally {
-            try {
-                outputStream.close();
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            outputStream.close();
+            inputStream.close();
         }
     }
 
