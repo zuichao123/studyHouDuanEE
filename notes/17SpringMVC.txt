@@ -1,0 +1,6 @@
+1、定义实体类
+2、定义repository
+3、定义repository实现，使用@Repository注解
+4、定义service
+5、定义service实现，使用@Service注解     注入@Autotried Repository
+6、定义controller层
