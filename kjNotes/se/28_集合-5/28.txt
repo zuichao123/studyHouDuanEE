@@ -1,0 +1,56 @@
+# Map
+
+Map中保存的数据是成对出现的，元素以对（两个）为单位保存在Map集合中，一对元素对应的关系是key-value，在Map集合中，这对元素首先封装成Map.Entry对象，再将Map.Entry对象保存到Map集合中。
+
+常用的实现类：
+
+HashMap，Hashtable，TreeMap
+
+HashMap：存储一组无序，并且key值不可重复的数据。
+
+Hashtable：存储一组无序，并且key值不可重复的数据，Hashtable的使用与HashMap基本一致，区别在于Hashtable是线程安全的，性能较低，HashMap是非线程安全的，性能较高。
+
+TreeMap：存储一组有序，并且key值不可重复的数据，这里的有序是指集合会自动根据key值对元素进行排序，默认是按照升序的方式排列，准确讲是对key值进行升序排列。
+
+存：put(Object key,Object value)
+
+取：get(Object key)
+
+删：remove(Object key)
+
+改：put(Object key,Object value) //key值已存在
+
+
+
+Collections：集合的工具类
+
+Collections VS Collection
+
+Collection是一个集合接口，用来存储数据的
+
+Collections是一个集合的工具类，用来操作集合中的数据的
+
+Collections常用方法：
+
+1.public static <T> boolean add.All(Collection<T> c,Collection<T> c) //将一个集合添加到另外一个集合中
+
+2.public static T max(Collection<T> c) //返回集合中的最大值
+
+3.public static T min(Collection<T> c) //返回集合中的最小值
+
+4.public static boolean replaceAll(List<T> list, T oldValue,T newVlaue) //将list集合中的oldValue全部替换为newValue
+
+5.public static void reverse(List<T> list) //将集合中的元素反转
+
+6.public static int binarySearch(List<T> list,T key) //查找集合中指定的元素
+
+7.public static final List<T> emptyList() //清空List集合
+
+8.public static final Map<K,V> emptyMap() //清空Map集合
+
+9.public static final Set<T> emptySet() //清空Set集合
+
+10.public static void sort(List<T> list) //对集合进行排序操作，规则根据T实现的ComparTo来决定
+
+11.public static void swap(List<T> list,int i,int j) //交换指定位置的元素
+

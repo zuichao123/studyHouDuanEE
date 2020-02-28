@@ -1,0 +1,30 @@
+tomcat是一个web应用服务，web应用服务是运行在服务器主机上的一个服务，作用将可以被客户端访问到的资源存在在web应用服务中，启动服务，客户端可以通过访问该服务来获取资源，除此之外的资源客户端是无法直接访问的，就保证了服务器的安全性。
+
+web应用服务：tomcat、jboss、weblogic、jetty
+
+tomcat不需要安装，解压之后可以直接使用。
+
+bin：存放不同平台下（windows linux）下启动和关闭tomcat服务的脚本文件
+
+conf：存放tomcat的各种配置文件
+
+lib：存放tomcat服务需要的jar
+
+logs：存放tomcat运行的日志文件
+
+temp：tomcat运行时存放临时文件
+
+webapps：存放允许客户端访问的资源
+
+work：存放JSP文件转换后的Servlet文件
+
+
+
+JavaWeb工程由Java代码和html代码组成的，html负责展示数据，Java负责处理业务逻辑，产生模型数据
+
+Java代码写在src目录下，html代码写在WebContent目录下
+
+JavaWeb工程默认jar包由两部分组成：1.jdk 2.tomcat
+
+
+

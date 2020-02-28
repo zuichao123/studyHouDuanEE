@@ -1,0 +1,74 @@
+异常：
+try catch finally throw throws
+自定义异常：
+创建一个普通的Java类，让它继承Exception，
+RuntimeException
+
+Exception分为checked exception和runtime exception，checked exception表示需要强制去处理的异常，即throw异常之后，需要立即处理该异常，要么try-catch，要么抛给上一层去处理，否则会报错"Unhandled exception type MyException"。
+runtim exception没有这个要求，throw之后可以不处理。
+
+直接继承自Exception的类就是checked exception，继承自RuntimeException的类就是runtime 
+exception。
+
+集合框架
+集合框架大致可分为三层，
+最上层是一组接口，继而是接口的实现类，接下来是针对集合各种操作的实现算法的工具类。
+
+接口：
+Collection：集合框架中最基本的接口，一个Collection存储一组无序，不唯一（可重复）的对象，一般不直接使用该接口。
+List：Collection的子接口，存储一组有序，不唯一的对象，最常用的接口之一。
+Set：Collection的子接口，存储一组无序，唯一（不可重复）的对象。
+Map：独立于Collection的另外一个接口，存储一组键值对象，key-value的映射，无序，key唯一，value不唯一。
+Iterator：输出集合元素的接口，一般跟Set结合起来使用，适用于无序集合。
+ListIterator：Iterator的子接口，可以双向输出集合中的元素。
+Enumeration：早期的输出接口，已经被Iterator所取代。
+SortedSet：Set的子接口，可以对集合中的元素进行排序。
+SortedMap：Map的子接口，可以对集合中的键值对象进行排列。
+Queue：队列接口，此接口的子类可以实现队列操作。
+Map.Entry：Map的内部接口，描述Map中的一个键值对象。
+
+Collection
+常用方法：
+int size()：获取集合长度
+boolean isEmpty()：判断集合是否为空
+boolean contains(Object o)：判断集合中是否存在某个对象
+Iterator<E> iterator()：实例化Iterator接口，遍历集合。
+Object[] toArray()：将集合转换为一个Object类型的对象数组。
+<T> T[] toArray(T[] a)：将集合转换为一个指定数据类型的对象数组。
+boolean add(E e)：向集合中添加一个元素。
+boolean remove(Object o)：从集合中移除元素。
+booelan containsAll(Collection<> c)：判断集合中是否存在另外一个集合的所有元素。
+boolean addAll(Collection<> c)：向集合中添加某个集合的所有元素
+boolean removeAll(Collection<> c)：从集合中移除某个集合的所有元素
+boolean removeIf(Predicate<> filter)：
+从集合中移除满足给定的集合所有元素
+boolean retainAll(Collection<> c)：对集合进行操作，只保留包含在该集合中的元素
+void clear()：清除集合中的所有元素
+boolean equals(Collection<> c)：比较两个集合是否相等
+int hashCode()：获取集合的哈希值。
+Spliterator<E> spliterator()：将集合转换为一个指定的数据类型的并行迭代器。
+Stream<E> stream()：将集合转换为一个流。
+Stream<E> parallelStream()：将集合转为为一个可并行的流。
+
+Collection的子接口
+List：存放有序，不唯一的元素。
+Set：存放无序，唯一的元素。
+Queue：队列接口。
+SortedSet：可对集合中的元素进行排序。
+
+List是Collection主要的子接口，一个List可以存储一组有序，不唯一的对象。
+
+List接口在继承Collection接口的基础上对方法进行了扩展，常用的扩展方法如下：
+E get(int index)：通过下标获取集合中指定位置的元素，类似于数组中的array[0]，list.get(0);
+E set(int index,E element)：替换集合中指定位置的元素。
+void add(int index,E element)：向指定的位置添加元素。
+E remove(int index)：通过下标删除集合中指定位置的元素。
+int indexOf(Objec o)：查找某个对象在集合中的位置。
+int lastIndexOf(Object o)：从后向前查找某个对象在集合中的位置。
+ListIterator<E> listIterator()：实例化ListIterator接口。
+List<E> subList(int fromIndex,int toIndex)：截取集合中的子集合
+[1,2,3,4,5,6,7]
+sub(int fromIndex,int toIndex)
+sub(3,4):[4]
+sub(int fromIndex,int length)
+sub(3,4):[4,5,6,7]

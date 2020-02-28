@@ -1,0 +1,98 @@
+### JSP
+
+是部署在web应用服务器上的一种资源，可以被客户端访问，将jsp的源代码直接返回给客户端，让客户端进行加载，浏览器加载html代码就会出现相应的图形界面。
+
+jsp其实就是一个Servlet，当客户端第一次访问一个jsp文件时，将该请求交给jsp引擎去处理。jsp引擎会将该jsp翻译成一个Servlet，然后进行编译，生成该Servlet的字节码文件class，再由web容器像调用Java程序一样来调用该程序。
+
+Java Web工程分两部分，一部分是给客户端展示的页面，另外一部分是进行逻辑处理的，最终的响应结果是这两部分整合起来的结构，将逻辑处理后的数据嵌入到页面中，再将混合之后的结果返回给客户端，带着动态数据的html。
+
+纯html是无法加入Java代码的，即如果选择html作为给客户端展示的页面，那么无法和逻辑处理的结果进行整合，则无法完成将带着动态数据的html返回给客户端。
+
+可以让客户端直接Servlet，通过Servlet的响应将html代码和Java代码进行混合输出，可以解决上述问题，但是这种方式同样会带来一个问题，编写代码过于繁琐，没有实际操作性。
+
+为了解决这一问题，就有了JSP。
+
+JSP本身就是一个Servlet，具备了将Java代码和html代码进行整合输出的功能，同时我们可以按照编写html代码的方式来编写JSP，可以将Java程序嵌入到html代码的任意位置。
+
+
+
+JSP可以完成在html代码中嵌入Java的功能，如嵌入？
+
+1.jsp脚本
+
+​	<% Java代码 %>
+
+2.jsp声明
+
+​	<%!
+
+​		声明一个全局方法
+
+​		声明一个全局变量
+
+​		%>
+
+3.jsp表达式
+
+​	<%=Java变量 %>
+
+
+
+JSP内置对象：JSP在转换为Servlet的时候，自动生成的一些对象，供代码调用的，在JSP页面中可以直接调用。
+
+JSP9大内置对象：
+
+1.request：HttpServletRequest的一个对象，接收客户端请求
+
+2.response：HttpServletResponse的一个对象，给客户端做出响应
+
+3.pageContext：PageContext的一个对象，页面上下文，获取页面信息
+
+4.session：HttpSession的一个对象，代表浏览器和服务器之间的一次会话
+
+5.application：ServletContext的一个对象，表示当前的WEB应用，全局对象，保存所有用户的共享数据
+
+6.config：当前JSP转换成Servlet之后的ServletConfig对象，获取当前Servlet的信息
+
+7.out：JspWriter的一个对象，向客户端输出信息
+
+8.page：指当前JSP对应的Servlet对象
+
+9.exception：表示JSP页面发生的异常
+
+常用的是pageContext，request，response，session，application
+
+
+
+request的常用方法：
+
+1.String getParameter(String name) //获取客户端传来的参数
+
+2.void setAttribute(String name,Object value) //通过键值对的形式保存数据
+
+3.Object getAttribute(String name) //根据name返回对应的value
+
+4.String[] getParameterValues(String name) //获取客户端传来的多个参数
+
+5.void setCharacterEncoding(String charset) //设置每个请求的编码
+
+6.RequestDispatcher getRequestDispatcher(String path) //返回一个RequestDispatcher对象，该对象的forward()用于请求的转发
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

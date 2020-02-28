@@ -1,0 +1,51 @@
+ServletContext：Servlet上下文，Servlet对象的管理者，可以获取Servlet对象相关的各种资源，作用于整个Web应用，每一个Servlet都被它管理。
+
+1.getInitParameter()				获取全局初始化参数
+
+```xml
+<context-param>
+    <param-name>username</param-name>
+    <param-value>admin</param-value>
+</context-param>
+
+<servlet>
+...
+</servlet>
+```
+
+2.getServerInfo()					获取当前WEB服务信息，tomcat
+
+3.getContextPath()				获取当前WEB应用名称/一般为工程名，可以手动修改
+
+4.getRealPath()					获取当前WEB应用的绝对路径
+
+
+
+Servlet的层次结构
+
+Servlet接口     (init、getServletConfig、service、getServletInfo、destory)
+
+​	|
+
+​     实 现
+
+​	|
+
+GenericServlet（抽象类）实现了Servlet接口的五个方法
+
+​	|
+
+​      继 承
+
+​	|
+
+HttpServlet（抽象类）重写service，根据请求类型将service方法分发到doGet，doPost，将ServletRequest转为HttpServletRequest，将ServletResponse转为HttpServletResponse
+
+​	|
+
+​     继 承
+
+​	|
+
+开发者自定义的Servlet（MyServlet）重写doGet，doPost完成相应的业务逻辑
+

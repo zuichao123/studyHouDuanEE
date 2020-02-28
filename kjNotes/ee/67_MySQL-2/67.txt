@@ -1,0 +1,260 @@
+字段的数据类型：
+
+- 整数类型：tinyint(1个byte)、smallint(2个byte)、mediumint(3个byte)、int(4个byte)、bigint(8个byte)
+
+  一个byte包含8位二进制数据，即8个0/1。
+
+- 浮点数、定点数
+
+  - 浮点类型：float、double，float(4个byte)：单精度浮点型，有效数字7位，范围小。double(8个byte)：双精度浮点型，有效数字16位，范围大。
+  - 定点类型：decimal，有效数字28位。
+
+  这三种类型的语法都是Type(M,D)M表示整数的最大值（精度），D是小数点右侧数字的个数。
+
+- 日期和时间类型
+
+  year(1个byte) 取值范围1901～2155
+
+  time(3个byte)取值范围"-838:59:59"~"838:59:59"负数是因为time可以表示时间间隔。
+
+  date(3个byte)取值范围"1000-01-01"~"9999-12-31"
+
+  datetime(8个byte)取值范围"1000-01-01 00:00:00"~"9999-12-31 23:59:59"
+
+  timestamp(4个byte)表示1970年1月1号到现在的毫秒数
+
+- 字符串类型
+
+  char(M)M个byte
+
+  varchar(M)M+1个byte
+
+  text(M)M+2个byte
+
+- 二进制
+
+  bit、binary、varbinary、tinyblob、blob、mediumblob、longblob
+
+
+管理数据库的结构
+
+- 创建数据库
+
+  ```sql
+  create database demo default character set utf8 collate utf8_general_ci;
+  ```
+
+- 删除数据库
+
+  ```sql
+  drop database demo;
+  ```
+
+- 查看所有的数据库
+
+  ```sql
+  show databases;
+  ```
+
+- 选择数据库
+
+  ```sql
+  use demo;
+  ```
+
+- 创建数据表
+
+  ```sql
+  create table student(
+  	id int,
+  	name varchar(11),
+  	score int
+  );
+  ```
+
+- 删除数据表
+
+  ```sql
+  drop table student;
+  ```
+
+- 查看某个数据库中的所有表
+
+  ```sql
+  show tables;
+  ```
+
+- 查看某张表的结构
+
+  ```sql
+  desc student;
+  ```
+
+- 修改表结构
+
+  - 新增一个字段
+
+    ```sql
+    alter table student add sex varchar(1);
+    ```
+
+  - 修改一个字段
+
+    ```sql
+    alter table student change sex gender int;
+    ```
+
+  - 删除一个字段
+
+    ```sql
+    alter table student drop gender;
+    ```
+
+管理数据库的数据
+
+- add
+
+  ```sql
+  insert into student(id,name,score) values(1,"张三",90);
+  ```
+
+  ```sql
+  insert into student(id,name) values(3,"王五");
+  ```
+
+  ```sql
+  insert into student values(4,"小明",66);
+  ```
+
+- 修改
+
+  ```sql
+  update student set name = "小红";
+  ```
+
+  ```sql
+  update student set name = "大黄",score = 70 where score = 66;
+  ```
+
+- 删除
+
+  ```sql
+  delete from student where id = 1;
+  ```
+
+- 查询
+
+  ```sql
+  select * from student;
+  ```
+
+  ```sql
+  select * from student where name = "张三2";
+  ```
+
+
+SQL函数：
+
+SQL提供了很多函数，可以完成一些较为复杂的功能，实际开发中尽量让Java程序来完成复杂的逻辑，SQL完成增删改查的功能。
+
+- 数学函数
+
+  - abs(num) 求绝对值 
+
+    ```sql
+    select abs(score) from student;
+    ```
+
+  - floor(num)返回小于参数的最大整数
+
+    ```sql
+    select floor(score) from student;
+    ```
+
+  - ceil(num)返回大于参数的最小整数
+
+    ```sql
+    select ceil(score) from student;
+    ```
+
+- 字符串函数
+
+  - insert(s1,index,len,s2)s1中index位置开始，长度为len的字符串替换为s2
+
+    ```sql
+    select insert(name,1,2,"李四") from student where id = 3;
+    ```
+
+  - upper()、ucase()将字母值转为大写。
+
+    ```sql
+    select ucase(name) from student where id = 3;
+    ```
+
+  - lower()、lcase()将字母值转为小写。
+
+    ```sql
+    select lower(name) from student where id = 3;
+    ```
+
+  - left(s,len)返回s字符串的前len个字符
+
+    ```sql
+    select left(name,3) from student where id = 3;
+    ```
+
+  - right(s,len)返回s字符串的后len个字符
+
+    ```sql
+    select right(name,3) from student where id = 3;
+    ```
+
+  - substring(s,index,len)截取s字符串，从index位置开始，长度为len
+
+    ```sql
+    select substring(name,3,4) from student where id = 3;
+    ```
+
+  - reverse(name)反序输出
+
+    ```sql
+    select reverse(name) from student where id = 3;
+    ```
+
+- 日期函数
+
+  - curdate()、current_date()获取当前日期
+
+    ```sql
+    select curdate();
+    ```
+
+  - curtime()、current_time()获取当前时间
+
+    ```sql
+    select curtime();
+    ```
+
+  - now()获取当前日期+时间
+
+    ```sql
+    select now();
+    ```
+
+  - datediff(d1,d2)获取d1和d2之间相隔的天数
+
+    ```sql
+    select datediff("2018-10-16","2018-12-06");
+    ```
+
+  - adddate(d,n)返回d日期之后n天的日期
+
+    ```sql
+    select adddate("2018-12-06",-62);
+    ```
+
+  - subdate(d,n)返回d日期之前n天的日期
+
+    ```sql
+    select subdate("2018-12-06",-62);
+    ```

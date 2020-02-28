@@ -1,0 +1,2 @@
+https://www.jetbrains.com/idea/download/#section=windows
+选择Community版本
