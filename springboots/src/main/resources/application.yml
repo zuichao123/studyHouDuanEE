@@ -1,0 +1,15 @@
+server:
+  port: 7778
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    # 关闭Thymeleaf缓存，否则在开发过程中修改页面不会立即生效，需要重启
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybatis?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: root
